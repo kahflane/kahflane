@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__grep__searchGitHub",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(source:*)",
+      "Bash(python:*)",
+      "Bash(timeout 10 uvicorn:*)",
+      "Bash(./scripts/run-integration-tests.sh:*)"
+    ]
+  }
+}

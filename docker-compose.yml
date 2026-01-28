@@ -1,0 +1,164 @@
+# Kahflane Docker Compose Configuration
+# Development and local deployment setup
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: kahflane-postgres
+    environment:
+      POSTGRES_USER: kahflane
+      POSTGRES_PASSWORD: kahflane
+      POSTGRES_DB: kahflane
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kahflane"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kahflane-network
+
+  # Redis (Message Broker for Dramatiq)
+  redis:
+    image: redis:7-alpine
+    container_name: kahflane-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kahflane-network
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: kahflane-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kahflane-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kahflane-backend
+    environment:
+      - DEBUG=true
+      - BASE_DOMAIN=localhost
+      - SECRET_KEY=dev-secret-key-change-in-production
+      # Database
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=kahflane
+      - DB_PASSWORD=kahflane
+      - DB_NAME=kahflane
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      # Qdrant
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      # CORS
+      - CORS_ORIGINS=["http://localhost:5000","http://localhost:8000","http://localhost:3000"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - backend_uploads:/app/uploads
+    networks:
+      - kahflane-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Background Worker (Dramatiq)
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kahflane-worker
+    environment:
+      - DEBUG=true
+      # Database
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=kahflane
+      - DB_PASSWORD=kahflane
+      - DB_NAME=kahflane
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      # Qdrant
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - backend_uploads:/app/uploads
+    networks:
+      - kahflane-network
+    command: dramatiq app.workers.tasks --processes 2 --threads 4
+
+  # Frontend (Blazor Server)
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Frontend/Dockerfile
+    container_name: kahflane-frontend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ApiBaseUrl=http://backend:8000
+      - BaseDomain=localhost
+    ports:
+      - "5000:5000"
+    depends_on:
+      - backend
+    networks:
+      - kahflane-network
+
+networks:
+  kahflane-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:
+  backend_uploads:

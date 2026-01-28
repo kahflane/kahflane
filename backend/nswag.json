@@ -1,0 +1,45 @@
+{
+  "runtime": "Net90",
+  "documentGenerator": {
+    "fromDocument": {
+      "json": "openapi.json"
+    }
+  },
+  "codeGenerators": {
+    "openApiToCSharpClient": {
+      "className": "KahflaneApiClient",
+      "namespace": "Frontend.Generated",
+      "generateClientInterfaces": true,
+      "generateDtoTypes": true,
+      "useBaseUrl": true,
+      "generateBaseUrlProperty": true,
+      "generateUpdateJsonSerializerSettingsMethod": false,
+      "useSystemTextJson": true,
+      "jsonLibrary": "SystemTextJson",
+      "dateType": "System.DateTimeOffset",
+      "dateTimeType": "System.DateTimeOffset",
+      "arrayType": "System.Collections.Generic.List",
+      "arrayBaseType": "System.Collections.Generic.List",
+      "arrayInstanceType": "System.Collections.Generic.List",
+      "dictionaryType": "System.Collections.Generic.Dictionary",
+      "dictionaryBaseType": "System.Collections.Generic.Dictionary",
+      "dictionaryInstanceType": "System.Collections.Generic.Dictionary",
+      "classStyle": "Poco",
+      "operationGenerationMode": "SingleClientFromOperationId",
+      "generateOptionalParameters": true,
+      "generateJsonMethods": false,
+      "generateDefaultValues": true,
+      "generateDataAnnotations": true,
+      "wrapResponses": false,
+      "generateResponseClasses": true,
+      "responseClass": "SwaggerResponse",
+      "injectHttpClient": true,
+      "disposeHttpClient": false,
+      "generateExceptionClasses": true,
+      "exceptionClass": "ApiException",
+      "handleReferences": false,
+      "generateNullableReferenceTypes": true,
+      "output": "/Users/julfikar/Documents/PassionFruit.nosync/kahflane/web/Frontend/Generated/KahflaneApiClient.cs"
+    }
+  }
+}

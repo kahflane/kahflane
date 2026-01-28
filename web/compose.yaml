@@ -1,0 +1,7 @@
+﻿services:
+  frontend:
+    image: frontend
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile
+
