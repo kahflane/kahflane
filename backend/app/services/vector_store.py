@@ -255,6 +255,7 @@ class VectorStoreService:
         team_id: Optional[UUID] = None,
         uploader_id: Optional[UUID] = None,
         scope: Optional[str] = None,
+        document_id: Optional[UUID] = None,
         limit: int = 10,
         score_threshold: float = 0.7,
     ) -> List[Dict[str, Any]]:
@@ -267,6 +268,7 @@ class VectorStoreService:
             team_id: Filter by team
             uploader_id: Filter by uploader (for personal scope)
             scope: Filter by scope
+            document_id: Filter by specific document (for single-document search)
             limit: Maximum results
             score_threshold: Minimum similarity score
 
@@ -316,6 +318,14 @@ class VectorStoreService:
                 models.FieldCondition(
                     key="scope",
                     match=models.MatchValue(value=scope),
+                )
+            )
+
+        if document_id:
+            must_conditions.append(
+                models.FieldCondition(
+                    key="document_id",
+                    match=models.MatchValue(value=str(document_id)),
                 )
             )
 

@@ -59,6 +59,7 @@ app = FastAPI(
         {"name": "tenants", "description": "Tenant management"},
         {"name": "organizations", "description": "Organization and team management"},
         {"name": "documents", "description": "Document upload, management, and retrieval"},
+        {"name": "search", "description": "Semantic search across documents"},
     ],
 )
 
