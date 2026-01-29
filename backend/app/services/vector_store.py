@@ -15,8 +15,8 @@ from app.core.tenant import get_current_tenant, TenantContext
 
 logger = logging.getLogger(__name__)
 
-# Vector dimension for text-embedding-004 model
-VECTOR_DIMENSION = 768
+# Vector dimension for Gemini embedding model
+VECTOR_DIMENSION = 3072
 
 # Collection name prefix
 COLLECTION_PREFIX = "kahflane_"

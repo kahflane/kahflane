@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # Model configuration
 EMBEDDING_MODEL = "gemini-embedding-001"
-EMBEDDING_DIMENSION = 768
+EMBEDDING_DIMENSION = 3072  # Gemini embedding model output dimension
 MAX_BATCH_SIZE = 100  # Maximum texts per API call
 
 

@@ -60,6 +60,7 @@ app = FastAPI(
         {"name": "organizations", "description": "Organization and team management"},
         {"name": "documents", "description": "Document upload, management, and retrieval"},
         {"name": "search", "description": "Semantic search across documents"},
+        {"name": "ask", "description": "RAG-based Q&A over documents"},
     ],
 )
 
